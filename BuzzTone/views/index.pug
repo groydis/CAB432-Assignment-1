@@ -1,5 +1,60 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h3 Articles from BuzzFeed about: '#{title}'
+  #chart_div
+  ul
+  each val in headlines
+    .row
+      .col.s12.m12
+        .card
+          .card-image
+            img(src=val.image)
+            span.card-title #{val.title}
+          .card-content
+            #article_chart
+            p
+              i #{val.source}
+              br
+              | #{val.description}
+              br
+              | TONE INFO:
+              br
+              each item in val.tones
+               | Score: #{item.score}
+               br
+               | Name: #{item.tone_name}
+               br
+          .card-action
+            a(href='#{val.url}') Read Article
+
+  script(type='text/javascript').
+    // Load Charts and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Draw the pie chart for Sarah's pizza when Charts is loaded.
+    google.charts.setOnLoadCallback(drawMainPieChart);
+
+    // Draw the pie chart for the Anthony's pizza when Charts is loaded.
+
+
+    // Callback that draws the pie chart for Sarah's pizza.
+    function drawMainPieChart() {
+      // Create the data table for Sarah's pizza.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Tone');
+      data.addColumn('number', 'Score');
+      data.addRows([
+      #{document_tones}
+      ]);
+      // Set options for Sarah's pie chart.
+      var options = {title:'Overall Tone Analysis',
+      width:400,
+      height:300};
+      // Instantiate and draw the chart for Sarah's pizza.
+      var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+
+

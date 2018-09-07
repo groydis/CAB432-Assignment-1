@@ -1,7 +1,36 @@
 doctype html
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-  body
-    block content
+    head
+        title= title
+        link(rel='stylesheet' type='text/css' href='/stylesheets/materialize.min.css')
+        link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+        script(src='/javascripts/materialize.min.js')
+        script(type='text/javascript', src='https://www.gstatic.com/charts/loader.js')
+body
+  .container
+    .row
+      .col.s12
+        //p s12
+      .col.s12.m4.l2
+        //p s12 m4
+      .col.s12.m4.l8
+        img(class='responsive-img', src='images/logo.png')
+        form(action='/', method='post')
+          .input-field.col.s12
+            input#searchquery.validate(type='text', name='query')
+            label(for='searchquery') Search
+          button.btn.waves-effect.waves-light.right(type='submit', value='Submit')
+            | Search
+            i.material-icons.right search
+      .col.s12.m4.l2
+        //p s12 m4
+    .row
+      .col.s12
+        //p s12
+      .col.s12.m4.l2
+        //p s12 m4
+      .col.s12.m4.l8
+        block content
+      .col.s12.m4.l2
+        //p s12 m4
+
