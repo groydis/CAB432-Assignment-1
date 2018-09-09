@@ -3,9 +3,10 @@ extends layout
 block content
   h3 Articles from BuzzFeed about: '#{title}'
   #chart_div
-  each val in articles
+  ul
+  each val in headlines
     .row
-      .col.s6.m6
+      .col.s12.m12
         .card
           .card-image
             img(src=val.image)
@@ -17,33 +18,38 @@ block content
               br
               | #{val.description}
               br
-              | <div id=#{val.div}></div>
+              | <div id=#{val.div}> </div>
           .card-action
             a(href='#{val.url}') Read Article
 
   script(type='text/javascript').
-
+    // Load Charts and the corechart package.
     google.charts.load('current', {'packages':['corechart']});
 
+    // Draw the pie chart for Sarah's pizza when Charts is loaded.
     google.charts.setOnLoadCallback(drawMainPieChart);
 
-    function drawMainPieChart() {
+    // Draw the pie chart for the Anthony's pizza when Charts is loaded.
 
+
+    // Callback that draws the pie chart for Sarah's pizza.
+    function drawMainPieChart() {
+      // Create the data table for Sarah's pizza.
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Tone');
       data.addColumn('number', 'Score');
       data.addRows([
       #{document_tones}
       ]);
-
+      // Set options for Sarah's pie chart.
       var options = {title:'Overall Tone Analysis',
       width:800,
       height:600};
-
+      // Instantiate and draw the chart for Sarah's pizza.
       var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
       chart.draw(data, options);
 
-      let articles = !{JSON.stringify(articles)};
+      let articles = !{JSON.stringify(headlines)};
       console.log(articles);
       articles.forEach( function (article) {
         var data = new google.visualization.DataTable();
@@ -54,17 +60,15 @@ block content
           [tone.tone_name, tone.score]
           ]);
         });
-
+        // Set options for Sarah's pie chart.
         var options = {title:'Article Tone Analysis',
-        width:400,
+        width:600,
         height:300};
-
+        // Instantiate and draw the chart for Sarah's pizza.
         var chart = new google.visualization.BarChart(document.getElementById(article.div));
         chart.draw(data, options);
       });
     }
-  script(type='text/javascript', src='javascripts/materialize.min.js')
-
 
 
 
