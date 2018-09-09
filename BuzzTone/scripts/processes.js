@@ -56,6 +56,7 @@ function buildHeadlines(response) {
 			description: article.description.replace('View Entire Post ›', ''),
 			url: article.url,
 			image: article.urlToImage,
+			div: 'chart' + i,
 		}
 		headlines[i] = headline;
 	}

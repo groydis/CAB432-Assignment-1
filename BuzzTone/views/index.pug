@@ -18,13 +18,7 @@ block content
               br
               | #{val.description}
               br
-              | TONE INFO:
-              br
-              each item in val.tones
-               | Score: #{item.score}
-               br
-               | Name: #{item.tone_name}
-               br
+              | <div id=#{val.div}> </div>
           .card-action
             a(href='#{val.url}') Read Article
 
@@ -49,11 +43,31 @@ block content
       ]);
       // Set options for Sarah's pie chart.
       var options = {title:'Overall Tone Analysis',
-      width:400,
-      height:300};
+      width:800,
+      height:600};
       // Instantiate and draw the chart for Sarah's pizza.
       var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
       chart.draw(data, options);
+
+      let articles = !{JSON.stringify(headlines)};
+      console.log(articles);
+      articles.forEach( function (article) {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Tone');
+        data.addColumn('number', 'Score');
+        article.tones.forEach(function (tone){
+          data.addRows([
+          [tone.tone_name, tone.score]
+          ]);
+        });
+        // Set options for Sarah's pie chart.
+        var options = {title:'Article Tone Analysis',
+        width:600,
+        height:300};
+        // Instantiate and draw the chart for Sarah's pizza.
+        var chart = new google.visualization.BarChart(document.getElementById(article.div));
+        chart.draw(data, options);
+      });
     }
 
 
