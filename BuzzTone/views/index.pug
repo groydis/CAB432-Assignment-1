@@ -39,7 +39,6 @@ block content
       var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
       chart.draw(data, options);
       let articles = !{JSON.stringify(articles)};
-      console.log(articles);
       articles.forEach( function (article) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Tone');

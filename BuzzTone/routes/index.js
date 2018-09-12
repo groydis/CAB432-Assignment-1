@@ -36,7 +36,7 @@ router.post('/', function(req, res, next) {
 		// Filter the response and create objects to be displayed
 		let articles = processor.buildArticles(response);
 		// Apply tones to the objects
-		processor.getTones(articles, function(toned_articles, doc_tones){
+		processor.getTones(articles, function(toned_articles, doc_tones) {
 			// Render the page
 			res.render('index', { title: title, articles: toned_articles, document_tones: doc_tones });
 		})
