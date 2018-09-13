@@ -1,8 +1,10 @@
 const NewsAPI = require('newsapi');
 const ToneAnalyzerV3 = require('watson-developer-cloud/tone-analyzer/v3');
 
+// News API Key
 const newsapi = new NewsAPI('bf12e04bc8c446c0862f63962dff0bad');
 
+// IBM Watson Tone Analyzer API Key
 const toneAnalyzer = new ToneAnalyzerV3({
     version: '2017-09-21',
     iam_apikey: 'tB6fhVfrDNFJul8iZ65Hw2GxJldc_Zk8JyWEqGcaMTkC',
@@ -79,8 +81,6 @@ function buildArticles(response) {
 		let response_item = response.articles[i];
 		// Create an object
 		let article = {
-			// Store the source
-			//source: response_item.source.name,
 			// Store the title
 			title: response_item.title,
 			// Store the description, do a cheeky little clean to remove some excess
@@ -105,7 +105,7 @@ function getTones(articles, callback) {
 		// Craete an empty array to hold the information sent to IBM
 		let article_descriptions = '';
 
-		// Loop through all the articles, grab the descriptions, and filter them.
+		// Loop through all the articles, grab the descriptions, and filter them
 		for (let i = 0; i < articles.length; i++) {
 
 			let title = articles[i].description;
@@ -152,7 +152,7 @@ function getTones(articles, callback) {
 							articles_to_show.push(articles[i]);
 						}
 					}
-					// Check to see that we do have some articles and tones.
+					// Check to see that we do have some articles and tones
 					if (articles_to_show.length === 0 || document_tones === 0) {
 						reject("Unable to find any tones for the articles requested.");
 					} else {
@@ -160,6 +160,7 @@ function getTones(articles, callback) {
 						resolve(callback(articles_to_show, document_tones));
 					}
 				} else {
+					// If the results don't match the number of articles, generated an error
 					reject("An error occured processing tones: Volume of tones did not match Volume of articles.")
 				}
 			}
