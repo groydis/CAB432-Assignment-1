@@ -21,12 +21,16 @@ async function getTopArticles() {
 			pageSize: 50,
 		}).then(response => {
 			// Check that the results are all g
-			if (response.status === 'ok') {
+			// First check see's if we get results
+			if (response.totalResults !== 0) {
 				// Shoot the response as the resolve for the promise
 				resolve(response);
+			// This handles what todo if no results are recieved
+			} else if (response.articles.length === 0) {
+				reject("We could not find any articles for: " + query);
+			// This handles any other weird errors that occur by the API.
 			} else {
-				// Return an error
-				reject("Fetching Articles: An Error Occured!")
+				reject(response);
 			}
 		});
 	});
@@ -49,13 +53,17 @@ async function getAllArticles(query) {
 			// Request 50 queries
 			pageSize: 50,
 		}).then(response => {
-			// Check that teh results are all g
-			if (response.status === 'ok') {
+			// Check that the results are all g
+			// First check see's if we get results
+			if (response.totalResults !== 0) {
 				// Shoot the response as the resolve for the promise
 				resolve(response);
+			// This handles what todo if no results are recieved
+			} else if (response.articles.length === 0) {
+				reject("We could not find any articles for: " + query);
+			// This handles any other weird errors that occur by the API.
 			} else {
-				// Return an error
-				reject("Fetching Articles: An Error Occured!");
+				reject(response);
 			}
 		});
 	});
@@ -94,41 +102,66 @@ function buildArticles(response) {
 
 function getTones(articles, callback) {
 	return new Promise((resolve, reject) => {
+		// Craete an empty array to hold the information sent to IBM
 		let article_descriptions = '';
 
+		// Loop through all the articles, grab the descriptions, and filter them.
 		for (let i = 0; i < articles.length; i++) {
 
 			let title = articles[i].description;
 			let text = title.replace(/\./g,'');
+			text = text.replace(/\!/g,'');
+			text = text.replace(/\?/g,'');
+			text = text.replace(/\:/g,'');
 			text = text.replace(/\-/g,'');
 			text = text.replace(/\>/g,'');
 			text = text.replace(/BuzzFeed News/g, '');
 			article_descriptions += text + '. ';
 		}
-
+		// Paramaters foor running Tone Analyzer
 		var toneParams = {
 				'tone_input': { 'text': article_descriptions },
 				'content_type': 'application/json',
 		};
 
+		// Runs the Tone Analyzer API
 		toneAnalyzer.tone(toneParams, function (error, toneAnalysis) {
+			// Handle any errors
 			if (error) {
 				reject(error)
 			} else {
+				// Store the results from the API in results
 				let results = toneAnalysis.sentences_tone;
+				// Creat an empty array for the overall document tones
 				let document_tones = [];
+				// Store the document tones form the API
 				let doc_tones = toneAnalysis.document_tone.tones;
+				// Run through all the document tones and clean them for Google Charts
 				for (let i = 0; i < doc_tones.length; i++) {
 					document_tones[i] = "['" + doc_tones[i].tone_name + "', " + doc_tones[i].score + "]";
 				}
+				// Create an empty array to handle the art
 				let articles_to_show = [];
-				for (let i = 0; i < results.length; i++) {
-					if (results[i].tones.length > 0) {
-						articles[i].tones = results[i].tones;
-						articles_to_show.push(articles[i]);
+				// Do a quick check to make sure the volume of articles matches the volume of tones
+				if (articles.length === results.length) {
+					// Loop through the results and append the tones to the article objects
+					for (let i = 0; i < results.length; i++) {
+						// Only add tones to an article if tones exist
+						if (results[i].tones.length > 0) {
+							articles[i].tones = results[i].tones;
+							articles_to_show.push(articles[i]);
+						}
 					}
+					// Check to see that we do have some articles and tones.
+					if (articles_to_show.length === 0 || document_tones === 0) {
+						reject("Unable to find any tones for the articles requested.");
+					} else {
+						// Resolve a call back, passing the articles with tones, and the document tones
+						resolve(callback(articles_to_show, document_tones));
+					}
+				} else {
+					reject("An error occured processing tones: Volume of tones did not match Volume of articles.")
 				}
-				resolve(callback(articles_to_show, document_tones));
 			}
 		});
 	});

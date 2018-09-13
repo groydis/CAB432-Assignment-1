@@ -3,9 +3,9 @@ extends layout
 block content
   h3 #{title}
   #chart_div.z-depth-1
-  .row
-    each val in articles
-      .col.s6
+  each val in articles
+    .row
+      .col.s12
         .card
           .card-image
             img(src=val.image)
@@ -15,7 +15,7 @@ block content
             p
               | #{val.description}
               br
-              | <div id=#{val.div}> </div>
+              | <div id=#{val.div} style='display: inline-block; margin: 0 auto;  width: auto;'> </div>
           .card-action
             a(href='#{val.url}') Read Article
 
@@ -50,8 +50,8 @@ block content
         });
 
         var options = {title:'Article Tone Analysis',
-        width:425,
-        height:200};
+        width:800,
+        height:300};
         var chart = new google.visualization.BarChart(document.getElementById(article.div));
         chart.draw(data, options);
       });

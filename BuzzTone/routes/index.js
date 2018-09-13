@@ -18,9 +18,12 @@ router.get('/', function(req, res, next) {
 		processor.getTones(articles, function(toned_articles, doc_tones){
 			// Render the page
 			res.render('index', { title: title, articles: toned_articles, document_tones: doc_tones });
+		})
+		.catch((err) => {
+			res.render('error', { message: 'An error occured retriving tones', error: err });
 		});
 	}).catch((err) => {
-	  throw err;
+	  res.render('error', { message: "An Error Occured Fetching Articles", error: err });
 	});
 });
 
@@ -45,7 +48,7 @@ router.post('/', function(req, res, next) {
 		});
 	})
 	.catch((err) => {
-		res.render('error', { message: 'An error occured retriving articles', error: err });
+		res.render('error', { message: "An Error Occured Fetching Articles", error: err });
 	});
 });
 
