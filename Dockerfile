@@ -1,5 +1,5 @@
 FROM node:carbon
-WORKDIR /App
+MAINTAINER greyden
 ADD . /App
 EXPOSE 3000
 WORKDIR /App/BuzzTone

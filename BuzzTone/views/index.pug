@@ -15,9 +15,11 @@ block content
             p
               | #{val.description}
               br
-              | <div id=#{val.div} style='display: inline-block; margin: 0 auto;  width: auto;'> </div>
+              | <div id=#{val.div} style='display: inline-block; margin: 0 auto;  width: auto;'>
+              br
+              |
           .card-action
-            a(href='#{val.url}') Read Article
+            a(href=val.url) Read Article
 
   script(type='text/javascript').
 

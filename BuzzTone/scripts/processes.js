@@ -43,6 +43,7 @@ async function getAllArticles(query) {
 	// Create a promise
 	return new Promise((resolve, reject) => {
 		// Call teh News API query to retrieve articles based on query
+		//let clean_query = query.replace(/%20/g, " ");
 		newsapi.v2.everything({
 			// Pass the query to the paramters of the API
 			q: query,
@@ -128,10 +129,23 @@ function getTones(articles, callback) {
 		toneAnalyzer.tone(toneParams, function (error, toneAnalysis) {
 			// Handle any errors
 			if (error) {
-				reject(error)
-			} else {
+				if (err.code == 404) {
+				    // Handle Not Found (404) error
+				} else if (err.code == 413) {
+				    // Handle Request Too Large (413) error
+				} else {
+				    console.log('Unexpected error: ', err.code);
+				    console.log('error:', err);
+				}
+			} else if (toneAnalysis) {
 				// Store the results from the API in results
 				let results = toneAnalysis.sentences_tone;
+				if (results === 'undefined') {
+					console.log('1');
+				} else if (results === undefined) {
+					console.log('2');
+					reject("No Tones found! Try Searching for something else!");
+				}
 				// Creat an empty array for the overall document tones
 				let document_tones = [];
 				// Store the document tones form the API
@@ -142,26 +156,32 @@ function getTones(articles, callback) {
 				}
 				// Create an empty array to handle the art
 				let articles_to_show = [];
+				// Do a quick check to make sure the results have objects inside them
+				if (results !== undefined) {
 				// Do a quick check to make sure the volume of articles matches the volume of tones
-				if (articles.length === results.length) {
-					// Loop through the results and append the tones to the article objects
-					for (let i = 0; i < results.length; i++) {
-						// Only add tones to an article if tones exist
-						if (results[i].tones.length > 0) {
-							articles[i].tones = results[i].tones;
-							articles_to_show.push(articles[i]);
+					if (articles.length === results.length) {
+						// Loop through the results and append the tones to the article objects
+						for (let i = 0; i < results.length; i++) {
+							// Only add tones to an article if tones exist
+							if (results[i].tones.length > 0) {
+								articles[i].tones = results[i].tones;
+								articles_to_show.push(articles[i]);
+							}
 						}
-					}
-					// Check to see that we do have some articles and tones
-					if (articles_to_show.length === 0 || document_tones === 0) {
-						reject("Unable to find any tones for the articles requested.");
+						// Check to see that we do have some articles and tones
+						if (articles_to_show.length === 0 || doc_tones === 0) {
+							reject("Unable to find any tones for the articles requested.");
+						} else {
+							// Resolve a call back, passing the articles with tones, and the document tones
+							resolve(callback(articles_to_show, document_tones));
+						}
 					} else {
-						// Resolve a call back, passing the articles with tones, and the document tones
-						resolve(callback(articles_to_show, document_tones));
+						// If the results don't match the number of articles, generated an error
+						reject("An error occured processing tones: Volume of tones did not match Volume of articles.")
 					}
 				} else {
-					// If the results don't match the number of articles, generated an error
-					reject("An error occured processing tones: Volume of tones did not match Volume of articles.")
+					// If no objects found in results, produce an error
+					reject("No Tones Found :( Try searching for something else!")
 				}
 			}
 		});
